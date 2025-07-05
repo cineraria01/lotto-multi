@@ -33,7 +33,7 @@
       {{ macros.setting_input_text('driver_remote_url', 'ID', desc=None, value=arg['driver_remote_url']) }}
       </div>
       {{ macros.m_hr() }}
-      {{ macros.setting_input_textarea('buy_data', '자동 구입 정보', desc=None, row=5, value=arg['buy_data']) }}
+      {{ macros.setting_input_textarea('buy_data', '자동 구입 정보', desc=['auto: 자동번호', 'manual : 1,2,3,4,5,6 : 수동번호', 'plugin_auto: 자동번호 재사용'], row=5, value=arg['buy_data']) }}
       {{ macros.setting_checkbox('buy_mode_one_of_week', '5건 구입 가능할 경우만 구입', value=arg['buy_mode_one_of_week'], desc=['On: 금주 회차 구입하지 않는 경우만 구입. 예) 매주 한게임씩 구입하는 경우', 'Off: 구입 가능 건수가 남은 경우 구입']) }}
       {{ macros.m_hr() }}
       {{ macros.setting_buttons([['test_info_btn', '기본 테스트'], ['test_buy_btn', '구입 테스트']], "테스트 버튼") }}

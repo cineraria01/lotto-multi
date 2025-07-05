@@ -104,8 +104,13 @@ class DhLottery:
         self.driver.switch_to.window(self.driver.window_handles[1])
 
         try:
+            # 페이지 로드 대기
+            time.sleep(2)
             # 내부 iframe으로 전환
-            self.driver.switch_to.frame(self.driver.find_element(By.TAG_NAME, "iframe"))
+            iframe = WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.TAG_NAME, "iframe"))
+            )
+            self.driver.switch_to.frame(iframe)
         except UnexpectedAlertPresentException as e:
             ret['ret'] = 'fail'
             ret['log'] = e.alert_text

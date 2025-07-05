@@ -29,7 +29,7 @@ class ModuleBasic(PluginModuleBase):
             f'driver_remote_url': 'http://172.17.0.1:4422/wd/hub',
             f'accounts': '[]',  # JSON array of {id, passwd, alias}
             f'charge_money': '20000',
-            f'buy_data': '',
+            f'buy_data': 'auto',
             f'notify_mode': 'always',
             f'buy_mode_one_of_week': 'True',
         }
