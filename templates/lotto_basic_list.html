@@ -5,8 +5,9 @@
 
 {{ macros.m_hr_head_top() }}
 {{ macros.m_row_start('0') }}
-{{ macros.m_col(3,  macros.m_strong('Img')) }}
-{{ macros.m_col(9,  macros.m_strong('Info')) }}
+{{ macros.m_col(2,  macros.m_strong('Img')) }}
+{{ macros.m_col(2,  macros.m_strong('계정')) }}
+{{ macros.m_col(8,  macros.m_strong('Info')) }}
 {{ macros.m_row_end() }}
 {{ macros.m_hr_head_bottom() }}
 <div id="list_div"></div>
@@ -37,22 +38,41 @@ function make_list(data) {
     
     tmp = '<div><img src="'+data[i].img+'" class="img-fluid thumbnail head_pic"><img src="'+data[i].img+'" class="before"></div>';
     str += j_col(2, tmp);
-    str += j_col(1, data[i].id);
-    str += j_col(2, data[i].created_time);
-
-    str += j_col(1, data[i].round);
-    str += j_col(1, data[i].count);
     
+    // 계정 정보 표시
     tmp = '';
-    for (j in data[i].data.buy.buy_list) {
-      tmp += data[i].data.buy.buy_list[j] + '\n'
+    if (data[i].account_alias) {
+      tmp = '<strong>' + data[i].account_alias + '</strong><br><small>' + (data[i].account_id || '') + '</small>';
+    } else {
+      tmp = '<small>기본 계정</small>';
     }
-
-    str += j_col(3, j_pre(tmp));
+    str += j_col(2, tmp);
+    
+    // 구매 정보
+    tmp = '<div class="row">';
+    tmp += '<div class="col-md-3">ID: ' + data[i].id + '</div>';
+    tmp += '<div class="col-md-5">시간: ' + data[i].created_time + '</div>';
+    tmp += '<div class="col-md-2">회차: ' + data[i].round + '</div>';
+    tmp += '<div class="col-md-2">건수: ' + data[i].count + '</div>';
+    tmp += '</div>';
+    
+    if (data[i].data && data[i].data.buy && data[i].data.buy.buy_list) {
+      tmp += '<div class="mt-2">';
+      for (j in data[i].data.buy.buy_list) {
+        tmp += '<span class="badge badge-info mr-1">' + data[i].data.buy.buy_list[j] + '</span>';
+      }
+      tmp += '</div>';
+    }
+    
+    if (data[i].data && data[i].data.deposit !== undefined) {
+      tmp += '<div class="mt-1"><small>예치금: ' + Number(data[i].data.deposit).toLocaleString() + '원</small></div>';
+    }
+    
+    str += j_col(6, tmp);
 
     tmp = ''
-    tmp += j_button('globalDbDeleteItemBtn', 'DB 삭제', {'id':data[i].id}, 'primary');
-    tmp += j_button('globalJsonBtn', 'JSON', {'idx':i}, 'primary');
+    tmp += j_button('globalDbDeleteItemBtn', 'DB 삭제', {'id':data[i].id}, 'danger btn-sm');
+    tmp += j_button('globalJsonBtn', 'JSON', {'idx':i}, 'info btn-sm');
     tmp = j_button_group(tmp)
     str += j_col(2, tmp, 'center')
 

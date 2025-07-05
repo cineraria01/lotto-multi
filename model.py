@@ -11,6 +11,8 @@ class ModelLottoItem(ModelBase):
     created_time = db.Column(db.DateTime)
     round = db.Column(db.String)
     count = db.Column(db.Integer)
+    account_alias = db.Column(db.String)  # 계정 별칭
+    account_id = db.Column(db.String)  # 계정 ID
     data = db.Column(db.JSON)
     img = db.Column(db.String)
 

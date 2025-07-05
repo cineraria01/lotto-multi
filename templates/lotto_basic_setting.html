@@ -15,8 +15,14 @@
 <form id='setting'>
   <div class="tab-content" id="nav-tabContent">
     {{ macros.m_tab_content_start('normal', true) }}
-      {{ macros.setting_input_text('user_id', 'ID', desc=None, value=arg['user_id'], col=3) }}
-      {{ macros.setting_input_text('user_passwd', 'PW', desc=None, value=arg['user_passwd'], col=3, type="password") }}
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <h5>계정 관리 <button type="button" class="btn btn-sm btn-primary" id="add_account_btn">계정 추가</button></h5>
+          <div id="accounts_container"></div>
+          <input type="hidden" name="accounts" id="accounts" value="{{ arg['accounts'] }}">
+        </div>
+      </div>
+      {{ macros.m_hr() }}
       {{ macros.setting_radio_with_value('notify_mode', '알림 모드', [['none', '없음'], ['always', '항상'], ['real_buy', '실제 구입시. 예치금 부족']], desc=['메시지 ID : lotto-multi'], value=arg['notify_mode']) }}
       {{ macros.m_hr() }}
       {{ macros.setting_radio_with_value('driver_mode', 'Selenium 드라이버 모드', [['local', '로컬'], ['remote', '리모트']], desc=None, value=arg['driver_mode']) }}
@@ -45,9 +51,21 @@
 </form>
 
 <script type="text/javascript">
+var accounts = [];
 
 $(document).ready(function(){
   set_driver_mode($("input[name='driver_mode']:checked").val());
+  
+  // 계정 목록 초기화
+  var accountsData = $('#accounts').val();
+  if (accountsData) {
+    try {
+      accounts = JSON.parse(accountsData);
+    } catch(e) {
+      accounts = [];
+    }
+  }
+  renderAccounts();
 });
 
 $('input[type=radio][name=driver_mode]').change(function() {
@@ -64,6 +82,73 @@ function set_driver_mode(type) {
     $('#remote_div').collapse('show');
   }
 }
+
+// 계정 렌더링
+function renderAccounts() {
+  var html = '';
+  accounts.forEach(function(account, idx) {
+    html += '<div class="card mb-2">';
+    html += '<div class="card-body">';
+    html += '<div class="row">';
+    html += '<div class="col-md-3">';
+    html += '<input type="text" class="form-control" placeholder="별칭" value="' + (account.alias || '') + '" id="alias_' + idx + '">';
+    html += '</div>';
+    html += '<div class="col-md-3">';
+    html += '<input type="text" class="form-control" placeholder="ID" value="' + account.id + '" id="id_' + idx + '">';
+    html += '</div>';
+    html += '<div class="col-md-3">';
+    html += '<input type="password" class="form-control" placeholder="비밀번호" value="' + account.passwd + '" id="passwd_' + idx + '">';
+    html += '</div>';
+    html += '<div class="col-md-3">';
+    html += '<button type="button" class="btn btn-sm btn-danger" onclick="removeAccount(' + idx + ')">삭제</button>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+  });
+  
+  if (accounts.length === 0) {
+    html = '<div class="alert alert-warning">등록된 계정이 없습니다. 위의 "계정 추가" 버튼을 클릭하여 계정을 추가하세요.</div>';
+  }
+  
+  $('#accounts_container').html(html);
+  updateAccountsInput();
+}
+
+// 계정 추가
+$('#add_account_btn').click(function() {
+  accounts.push({
+    alias: '계정' + (accounts.length + 1),
+    id: '',
+    passwd: ''
+  });
+  renderAccounts();
+});
+
+// 계정 삭제
+function removeAccount(idx) {
+  if (confirm('이 계정을 삭제하시겠습니까?')) {
+    accounts.splice(idx, 1);
+    renderAccounts();
+  }
+}
+
+// 계정 정보 업데이트
+function updateAccountsInput() {
+  // 현재 입력된 값들을 accounts 배열에 반영
+  accounts.forEach(function(account, idx) {
+    account.alias = $('#alias_' + idx).val() || account.id;
+    account.id = $('#id_' + idx).val();
+    account.passwd = $('#passwd_' + idx).val();
+  });
+  
+  $('#accounts').val(JSON.stringify(accounts));
+}
+
+// 저장 전에 계정 정보 업데이트
+$(document).on('click', '#globalSettingSaveBtn', function() {
+  updateAccountsInput();
+});
 
 $("body").on('click', '#test_info_btn', function(e){
   e.preventDefault();
