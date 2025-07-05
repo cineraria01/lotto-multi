@@ -1,5 +1,6 @@
 import base64
 import random
+import traceback
 from io import BytesIO
 
 from PIL import Image
@@ -25,7 +26,7 @@ class ModuleBasic(PluginModuleBase):
 
             f'driver_mode': 'remote',
             f'driver_local_headless': 'False',
-            f'driver_remote_url': 'http://172.17.0.1:4444/wd/hub',
+            f'driver_remote_url': 'http://172.17.0.1:4422/wd/hub',
             f'accounts': '[]',  # JSON array of {id, passwd, alias}
             f'charge_money': '20000',
             f'buy_data': '',
@@ -176,15 +177,24 @@ class ModuleBasic(PluginModuleBase):
                 ToolNotify.send_message(msg, 'lotto-multi', image_url=img_url)
                 
         except Exception as e:
-            logger.error(f'Exception:{str(e)}')
-            logger.error(traceback.format_exc())
+            P.logger.error(f'Exception:{str(e)}')
+            P.logger.error(traceback.format_exc())
 
     def do_action_multi(self, mode="buy", max_retries=2):
         """여러 계정을 순차적으로 처리"""
         import json
         import time
         results = []
-        accounts = json.loads(P.ModelSetting.get('accounts') or '[]')
+        accounts_str = P.ModelSetting.get('accounts') or '[]'
+        P.logger.info(f"Raw accounts string from settings: {accounts_str}")
+        
+        try:
+            accounts = json.loads(accounts_str)
+        except json.JSONDecodeError as e:
+            P.logger.error(f"Failed to parse accounts JSON: {e}")
+            accounts = []
+        
+        P.logger.info(f"Loaded accounts: {len(accounts)} accounts")
         
         if not accounts:
             # 이전 버전 호환성을 위해 단일 계정 확인
@@ -246,15 +256,28 @@ class ModuleBasic(PluginModuleBase):
             
             # 로그인
             try:
+                P.logger.debug(f"Attempting login for account: {account.get('id', 'NO_ID')}")
                 lotto.login(account['id'], account['passwd'])
+                P.logger.info(f"Login successful for account: {account.get('id')}")
             except Exception as e:
                 P.logger.error(f"Login failed for {account['id']}: {str(e)}")
                 ret['status'] = 'LOGIN_FAILED'
                 ret['error'] = str(e)
                 return ret
+            
+            try:    
+                P.logger.debug("Checking deposit...")
+                ret['deposit'] = lotto.check_deposit()
+                P.logger.debug(f"Deposit: {ret['deposit']}")
                 
-            ret['deposit'] = lotto.check_deposit()
-            ret['history'] = lotto.check_history()
+                P.logger.debug("Checking history...")
+                ret['history'] = lotto.check_history()
+                P.logger.debug(f"History count: {ret['history']['count']}")
+            except Exception as e:
+                P.logger.error(f"Error during deposit/history check: {str(e)}")
+                P.logger.error(traceback.format_exc())
+                raise
+                
             stream = BytesIO(ret['history']['screen_shot'])
             img = Image.open(stream)
             img.save(stream, format='png')
@@ -293,8 +316,8 @@ class ModuleBasic(PluginModuleBase):
                 
             return ret
         except Exception as e:
-            logger.error(f'Exception:{str(e)}')
-            logger.error(traceback.format_exc())
+            P.logger.error(f'Exception:{str(e)}')
+            P.logger.error(traceback.format_exc())
             ret['status'] = 'error'
             ret['log'] = str(traceback.format_exc())
             return ret
@@ -344,8 +367,8 @@ class ModuleBasic(PluginModuleBase):
                 ret['buy']['screen_shot'] = base64.b64encode(stream.getvalue()).decode()
             return ret
         except Exception as e:
-            logger.error(f'Exception:{str(e)}')
-            logger.error(traceback.format_exc())
+            P.logger.error(f'Exception:{str(e)}')
+            P.logger.error(traceback.format_exc())
             ret['status'] = 'fail'
             ret['log'] = str(traceback.format_exc())
         finally:
@@ -371,5 +394,5 @@ class ModuleBasic(PluginModuleBase):
                 ret.append(f"manual : {','.join(plugin_auto)}")
             else:
                 ret.append(item)
-        P.logger.info(d(ret))
+        P.logger.info(f"Buy data: {ret}")
         return ret

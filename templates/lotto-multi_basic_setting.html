@@ -152,23 +152,19 @@ $(document).on('click', '#globalSettingSaveBtn', function() {
 
 $("body").on('click', '#test_info_btn', function(e){
   e.preventDefault();
+  updateAccountsInput(); // 테스트 전 계정 정보 저장
   globalSendCommand('test_info', null, null, null, function(ret) {
-    var html = $('#modal_body').html();
-    var str = '<img src="data:image/png;base64,'+ret['data']['history']['screen_shot']+'" class="img-fluid rounded">';
-    str = html + '<br>' + str;
-    $('#modal_body').html(str);
+    // 멀티 계정 응답은 ret.modal에 전체 결과가 있음
+    // 추가 처리 필요 없음
   });
 });
 
 $("body").on('click', '#test_buy_btn', function(e){
   e.preventDefault();
+  updateAccountsInput(); // 테스트 전 계정 정보 저장
   globalSendCommand('test_buy', null, null, null, function(ret) {
-    var html = $('#modal_body').html();
-    if (ret.data.buy != null) {
-      var str = '<img src="data:image/png;base64,'+ret['data']['buy']['screen_shot']+'" class="img-fluid rounded">';
-      str = html + '<br>' + str;
-      $('#modal_body').html(str);
-    }
+    // 멀티 계정 응답은 ret.modal에 전체 결과가 있음
+    // 추가 처리 필요 없음
   });
 });
 
