@@ -105,7 +105,7 @@ class ModuleBasic(PluginModuleBase):
                 notify = False
             
             if notify:
-                ToolNotify.send_message(msg, 'lotto', image_url=img_url)
+                ToolNotify.send_message(msg, 'lotto-multi', image_url=img_url)
         except Exception as e:
             logger.error(f'Exception:{str(e)}')
             logger.error(traceback.format_exc())

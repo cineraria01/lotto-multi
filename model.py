@@ -3,7 +3,7 @@ from .setup import *
 
 class ModelLottoItem(ModelBase):
     P = P
-    __tablename__ = 'lotto_item'
+    __tablename__ = 'lotto_multi_item'
     __table_args__ = {'mysql_collate': 'utf8_general_ci'}
     __bind_key__ = P.package_name
 

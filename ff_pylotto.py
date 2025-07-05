@@ -74,7 +74,7 @@ class DhLottery:
     def send_message(_msg):
         _msg = '<로또>\n' + _msg
         from tool import ToolNotify
-        ToolNotify.send_message(_msg, "lotto",)
+        ToolNotify.send_message(_msg, "lotto-multi",)
 
     def send_result(self, _data):
         _msg = '구매성공!!\n' + '=' * 15
