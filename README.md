@@ -18,13 +18,13 @@ selenium 공식 도커 이미지중 firefox로 테스트 함.
 공식 사이트 : [https://github.com/SeleniumHQ/docker-selenium](https://github.com/SeleniumHQ/docker-selenium)
 - amd64  
     ```
-    docker run -d --name selenium_firefox -p 4444:4444 -p 5900:5900 -p 7900:7900 --shm-size 2g selenium/standalone-firefox:latest
+    docker run -d --name selenium_firefox -p 4422:4444 -p 5922:5900 -p 7922:7900 --shm-size 2g selenium/standalone-firefox:latest
     ```
 
 
 - arm (오라클 A1)  
     ```
-    docker run -d --name selenium_firefox -p 4444:4444 -p 5900:5900 -p 7900:7900 --shm-size 2g seleniarm/standalone-firefox:latest 
+    docker run -d --name selenium_firefox -p 4422:4444 -p 5922:5900 -p 7922:7900 --shm-size 2g seleniarm/standalone-firefox:latest 
     ```
 
 selenium / seleniarm 차이
@@ -32,7 +32,6 @@ selenium / seleniarm 차이
 웹 비밀번호 : secret
 
 
-<img src="https://cdn.discordapp.com/attachments/1027467195170693170/1049150944291602472/image.png" width="50%">
 
 구매시 noVnc 스샷
 

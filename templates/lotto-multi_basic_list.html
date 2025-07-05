@@ -36,7 +36,13 @@ function make_list(data) {
     console.log(data[i]);
     str += j_row_start();
     
-    tmp = '<div><img src="'+data[i].img+'" class="img-fluid thumbnail head_pic"><img src="'+data[i].img+'" class="before"></div>';
+    // 이미지 경로 처리
+    var imgSrc = data[i].img;
+    if (imgSrc && imgSrc.startsWith('/')) {
+      // 로컬 이미지는 data 경로를 통해 접근
+      imgSrc = '/data/lotto-multi' + imgSrc.replace('/lotto-multi', '');
+    }
+    tmp = '<div><img src="'+imgSrc+'" class="img-fluid thumbnail head_pic"><img src="'+imgSrc+'" class="before"></div>';
     str += j_col(2, tmp);
     
     // 계정 정보 표시
