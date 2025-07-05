@@ -100,10 +100,9 @@ class ModuleBasic(PluginModuleBase):
                         img = Image.open(BytesIO(img_bytes_raw))
                         img.save(filepath)
                         
-                        # 플러그인 경로로 직접 접근
-                        img_url = f"/lotto-multi/screenshots/test/{filename}"
+                        # Base64 인라인 이미지로 직접 표시
                         screenshots_html += f'<h5>{data["account_alias"]} 구매 이력</h5>'
-                        screenshots_html += f'<img src="{img_url}" class="img-fluid rounded mb-3" style="max-width: 500px;"><br>'
+                        screenshots_html += f'<img src="data:image/png;base64,{data["history"]["screen_shot"]}" class="img-fluid rounded mb-3" style="max-width: 500px;"><br>'
                     
                     if command == 'test_buy' and data.get('status') == 'success' and 'buy' in data and data['buy'].get('screen_shot'):
                         # 구매 테스트 스크린샷
@@ -118,10 +117,9 @@ class ModuleBasic(PluginModuleBase):
                         img = Image.open(BytesIO(img_bytes_raw))
                         img.save(filepath)
                         
-                        # 플러그인 경로로 직접 접근
-                        img_url = f"/lotto-multi/screenshots/test/{filename}"
+                        # Base64 인라인 이미지로 직접 표시
                         screenshots_html += f'<h5>{data["account_alias"]} 구매 화면</h5>'
-                        screenshots_html += f'<img src="{img_url}" class="img-fluid rounded mb-3" style="max-width: 500px;"><br>'
+                        screenshots_html += f'<img src="data:image/png;base64,{data["buy"]["screen_shot"]}" class="img-fluid rounded mb-3" style="max-width: 500px;"><br>'
                 
                 ret['modal'] = f'<pre>{modal_text}</pre><hr>{screenshots_html}'
                 ret['title'] = "멀티 계정 테스트"
@@ -171,8 +169,8 @@ class ModuleBasic(PluginModuleBase):
                             img = Image.open(BytesIO(img_bytes))
                             img.save(filepath)
                             
-                            # 플러그인 경로로 직접 접근 가능
-                            db_item.img = f"/lotto-multi/screenshots/{filename}"
+                            # Base64 이미지 데이터를 직접 저장
+                            db_item.img = f"data:image/png;base64,{result['buy']['screen_shot']}"
                         db_item.save()
                 else:
                     failed_accounts.append(result['account_alias'])

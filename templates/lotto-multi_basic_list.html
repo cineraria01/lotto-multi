@@ -36,7 +36,7 @@ function make_list(data) {
     console.log(data[i]);
     str += j_row_start();
     
-    // 이미지 경로는 그대로 사용 (플러그인 경로로 직접 접근)
+    // Base64 이미지 또는 경로 사용
     var imgSrc = data[i].img || '';
     tmp = '<div><img src="'+imgSrc+'" class="img-fluid thumbnail head_pic"><img src="'+imgSrc+'" class="before"></div>';
     str += j_col(2, tmp);
