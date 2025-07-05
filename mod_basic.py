@@ -88,37 +88,38 @@ class ModuleBasic(PluginModuleBase):
                 screenshots_html = ""
                 for idx, data in enumerate(results):
                     if data.get('status') == 'success' and 'history' in data and data['history'].get('screen_shot'):
-                        # 이미지 저장
-                        img_bytes = base64.b64decode(data['history']['screen_shot'])
-                        img_folder = os.path.join(F.config['path_data'], P.package_name, 'screenshots', 'test')
+                        # 이미지 저장을 플러그인 폴더 내에 직접
+                        img_bytes_raw = base64.b64decode(data['history']['screen_shot'])
+                        img_folder = os.path.join(os.path.dirname(__file__), 'screenshots', 'test')
                         os.makedirs(img_folder, exist_ok=True)
                         
                         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                         filename = f"test_{data['account_alias']}_{timestamp}.png"
                         filepath = os.path.join(img_folder, filename)
                         
-                        img = Image.open(BytesIO(img_bytes))
+                        img = Image.open(BytesIO(img_bytes_raw))
                         img.save(filepath)
                         
-                        # HTML에 이미지 추가
-                        img_url = f"/data/lotto-multi/screenshots/test/{filename}"
+                        # 플러그인 경로로 직접 접근
+                        img_url = f"/lotto-multi/screenshots/test/{filename}"
                         screenshots_html += f'<h5>{data["account_alias"]} 구매 이력</h5>'
                         screenshots_html += f'<img src="{img_url}" class="img-fluid rounded mb-3" style="max-width: 500px;"><br>'
                     
                     if command == 'test_buy' and data.get('status') == 'success' and 'buy' in data and data['buy'].get('screen_shot'):
                         # 구매 테스트 스크린샷
-                        img_bytes = base64.b64decode(data['buy']['screen_shot'])
-                        img_folder = os.path.join(F.config['path_data'], P.package_name, 'screenshots', 'test')
+                        img_bytes_raw = base64.b64decode(data['buy']['screen_shot'])
+                        img_folder = os.path.join(os.path.dirname(__file__), 'screenshots', 'test')
                         os.makedirs(img_folder, exist_ok=True)
                         
                         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                         filename = f"test_buy_{data['account_alias']}_{timestamp}.png"
                         filepath = os.path.join(img_folder, filename)
                         
-                        img = Image.open(BytesIO(img_bytes))
+                        img = Image.open(BytesIO(img_bytes_raw))
                         img.save(filepath)
                         
-                        img_url = f"/data/lotto-multi/screenshots/test/{filename}"
+                        # 플러그인 경로로 직접 접근
+                        img_url = f"/lotto-multi/screenshots/test/{filename}"
                         screenshots_html += f'<h5>{data["account_alias"]} 구매 화면</h5>'
                         screenshots_html += f'<img src="{img_url}" class="img-fluid rounded mb-3" style="max-width: 500px;"><br>'
                 
@@ -158,12 +159,11 @@ class ModuleBasic(PluginModuleBase):
                         db_item.data = result
                         if 'buy' in result:
                             img_bytes = base64.b64decode(result['buy']['screen_shot'])
-                            # 이미지 저장 폴더 생성
-                            img_folder = os.path.join(F.config['path_data'], P.package_name, 'screenshots')
+                            # 이미지 저장 폴더 생성 (플러그인 폴더 내)
+                            img_folder = os.path.join(os.path.dirname(__file__), 'screenshots')
                             os.makedirs(img_folder, exist_ok=True)
                             
                             # 파일명에 날짜 포함
-                            from datetime import datetime
                             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                             filename = f"{result['account_alias']}_{result['buy']['round']}_{timestamp}.png"
                             filepath = os.path.join(img_folder, filename)
@@ -171,8 +171,8 @@ class ModuleBasic(PluginModuleBase):
                             img = Image.open(BytesIO(img_bytes))
                             img.save(filepath)
                             
-                            # 상대 경로로 저장 (웹에서 접근 가능하도록)
-                            db_item.img = f"/{P.package_name}/screenshots/{filename}"
+                            # 플러그인 경로로 직접 접근 가능
+                            db_item.img = f"/lotto-multi/screenshots/{filename}"
                         db_item.save()
                 else:
                     failed_accounts.append(result['account_alias'])
@@ -220,10 +220,9 @@ class ModuleBasic(PluginModuleBase):
                     if 'buy' in result and len(result['buy']['buy_list']) > 0:
                         img_bytes = base64.b64decode(result['buy']['screen_shot'])
                         # 알림용 이미지도 같은 폴더에 저장
-                        img_folder = os.path.join(F.config['path_data'], P.package_name, 'screenshots')
+                        img_folder = os.path.join(os.path.dirname(__file__), 'screenshots')
                         os.makedirs(img_folder, exist_ok=True)
                         
-                        from datetime import datetime
                         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                         filename = f"summary_{result['buy']['round']}_{timestamp}.png"
                         filepath = os.path.join(img_folder, filename)
