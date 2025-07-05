@@ -6,6 +6,7 @@ import traceback
 from datetime import datetime
 from io import BytesIO
 
+from flask import jsonify
 from PIL import Image
 from support import SupportDiscord
 from tool import ToolNotify
@@ -47,7 +48,36 @@ class ModuleBasic(PluginModuleBase):
     
     def process_command(self, command, arg1, arg2, arg3, req):
         ret = {'ret': 'success'}
-        if command == 'test_info' or command == 'test_buy':
+        if command == 'get_image':
+            # 이미지 파일을 Base64로 변환해서 반환
+            try:
+                filepath = arg1
+                if os.path.exists(filepath):
+                    with open(filepath, 'rb') as f:
+                        img_data = base64.b64encode(f.read()).decode()
+                    ret['data'] = f"data:image/png;base64,{img_data}"
+                else:
+                    ret['ret'] = 'fail'
+                    ret['msg'] = '이미지 파일을 찾을 수 없습니다.'
+            except Exception as e:
+                ret['ret'] = 'fail'
+                ret['msg'] = str(e)
+        elif command == 'clean_test_images':
+            # 테스트 이미지 폴더 정리
+            try:
+                test_folder = os.path.join(os.path.dirname(__file__), 'screenshots', 'test')
+                if os.path.exists(test_folder):
+                    for filename in os.listdir(test_folder):
+                        if filename.startswith('test_'):
+                            filepath = os.path.join(test_folder, filename)
+                            os.remove(filepath)
+                    ret['msg'] = '테스트 이미지가 삭제되었습니다.'
+                else:
+                    ret['msg'] = '테스트 폴더가 없습니다.'
+            except Exception as e:
+                ret['ret'] = 'fail'
+                ret['msg'] = str(e)
+        elif command == 'test_info' or command == 'test_buy':
             results = self.do_action_multi(mode=command)
             
             if len(results) == 0:
@@ -169,8 +199,8 @@ class ModuleBasic(PluginModuleBase):
                             img = Image.open(BytesIO(img_bytes))
                             img.save(filepath)
                             
-                            # Base64 이미지 데이터를 직접 저장
-                            db_item.img = f"data:image/png;base64,{result['buy']['screen_shot']}"
+                            # 파일 경로만 저장
+                            db_item.img = filepath
                         db_item.save()
                 else:
                     failed_accounts.append(result['account_alias'])

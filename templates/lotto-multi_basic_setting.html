@@ -66,6 +66,13 @@ $(document).ready(function(){
     }
   }
   renderAccounts();
+  
+  // 모달이 닫힐 때 테스트 이미지 삭제
+  $('#globalModal').on('hidden.bs.modal', function () {
+    globalSendCommand('clean_test_images', null, null, null, function(ret) {
+      console.log('Test images cleaned');
+    });
+  });
 });
 
 $('input[type=radio][name=driver_mode]').change(function() {

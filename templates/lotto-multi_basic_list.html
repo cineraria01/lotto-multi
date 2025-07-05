@@ -36,9 +36,8 @@ function make_list(data) {
     console.log(data[i]);
     str += j_row_start();
     
-    // Base64 이미지 또는 경로 사용
-    var imgSrc = data[i].img || '';
-    tmp = '<div><img src="'+imgSrc+'" class="img-fluid thumbnail head_pic"><img src="'+imgSrc+'" class="before"></div>';
+    // 이미지 처리 - 일단 빈 이미지로 표시하고 나중에 로드
+    tmp = '<div><img id="img_'+data[i].id+'" src="" class="img-fluid thumbnail head_pic" data-filepath="'+(data[i].img || '')+'"><img id="img_hover_'+data[i].id+'" src="" class="before"></div>';
     str += j_col(2, tmp);
     
     // 계정 정보 표시
@@ -82,6 +81,22 @@ function make_list(data) {
     if (i != data.length -1) str += j_hr();
   }
   $("#list_div").html(str);
+  
+  // 이미지 로드
+  loadImages(data);
+}
+
+function loadImages(data) {
+  data.forEach(function(item) {
+    if (item.img) {
+      globalSendCommand('get_image', item.img, null, null, function(ret) {
+        if (ret.ret == 'success' && ret.data) {
+          $('#img_' + item.id).attr('src', ret.data);
+          $('#img_hover_' + item.id).attr('src', ret.data);
+        }
+      });
+    }
+  });
 }
 
 $('body').on('mouseover', '.head_pic', (e)=>{
